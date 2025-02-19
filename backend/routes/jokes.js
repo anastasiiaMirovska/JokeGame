@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 const mongoose = require('mongoose')
 const {Jokes} = require('../dataBase')
+const {fetchMultipleJokes} = require("../services/jokeService");
 
 router.get('/', async (req, res) => {
     const joke = await Jokes.aggregate([{ $sample: { size: 1 } }]);
@@ -76,5 +77,13 @@ router.get('/all', async (req, res) => {
     res.json(jokes);
 });
 
-
+router.get('/add', async (req, res) => {
+    try {
+        await fetchMultipleJokes(10);
+        res.json({ message: "jokes added successfully" });
+    } catch (error) {
+        console.error("Error fetching jokes:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+});
 module.exports = router;

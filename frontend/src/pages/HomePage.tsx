@@ -1,9 +1,10 @@
-import React from 'react';
 
 const HomePage = () => {
     return (
         <div>
-            Home page
+            <p>
+                Hello, this is my application where you can read jokes and vote for it by multiple emojis
+            </p>
         </div>
     );
 };

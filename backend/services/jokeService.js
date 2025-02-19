@@ -18,7 +18,21 @@ const fetchAndSaveJokes = async () => {
             const joke = {
                 question: jokeData.question,
                 answer: jokeData.answer,
-                availableVotes: ["😂", "👍", "❤️"]
+                votes:[
+                    {
+                        value: 0,
+                        label: "😂",
+                    },
+                    {
+                        value: 0,
+                        label: "👍",
+                    },
+                    {
+                        value: 0,
+                        label: "❤️",
+                    },
+                ],
+                // availableVotes: ["😂", "👍", "❤️"]
             };
 
             const newJoke = new Jokes(joke);

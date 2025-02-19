@@ -23,10 +23,10 @@ const jokeSchema = new Schema({
             }
         }
     ],
-    availableVotes: {
-        type: [String],
-        default: ["😂", "👍", "❤️"]
-    }
+    // availableVotes: {
+    //     type: [String],
+    //     default: ["😂", "👍", "❤️"]
+    // }
 }, { timestamps: true })
 
 module.exports = model('jokes', jokeSchema)
