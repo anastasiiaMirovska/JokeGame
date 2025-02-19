@@ -7,13 +7,35 @@ const AllJokesComponent = () => {
     const [jokes, setJokes] = useState<IJokeModel[]>([]);
 
     useEffect(() => {
-        jokeService.getAllJokes().then((res) => setJokes(res));
+        jokeService.getAllJokes().then(setJokes);
     }, []);
+
+    const updateJoke = (updatedJoke: IJokeModel) => {
+        setJokes((prevJokes) =>
+            prevJokes.map((j) => (j._id === updatedJoke._id ? updatedJoke : j))
+        );
+    };
+
+    const deleteJoke = async (id: string) => {
+        try {
+            await jokeService.deleteJoke(id);
+            setJokes((prevJokes) => prevJokes.filter((j) => j._id !== id));
+        } catch (error) {
+            console.error("Error deleting joke:", error);
+        }
+    };
 
     return (
         <div>
             {jokes.length > 0 ? (
-                jokes.map((joke) => <JokeComponent key={joke._id} joke={joke} />)
+                jokes.map((joke) => (
+                    <JokeComponent
+                        key={joke._id}
+                        joke={joke}
+                        onJokeUpdate={updateJoke}
+                        onDelete={deleteJoke}
+                    />
+                ))
             ) : (
                 <p>No more jokes!</p>
             )}

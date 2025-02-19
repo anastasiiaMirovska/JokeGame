@@ -2,36 +2,32 @@ import { FC, useEffect, useState } from "react";
 import { IJokeModel } from "../models/IJokeModel.tsx";
 import { jokeService } from "../services/apiservice.tsx";
 import VoteComponent from "./VoteComponent.tsx";
+import JokeUpdateFormComponent from "./JokeUpdateFormComponent.tsx";
 
 interface IProps {
     joke: IJokeModel;
-    reveal?: boolean;
-    resetRevealTrigger?: number;
+    onJokeUpdate: (updatedJoke: IJokeModel) => void;
+    onDelete: (id: string) => void;
+    onNextJoke?: () => void;
 }
 
-const JokeComponent: FC<IProps> = ({ joke, reveal = false, resetRevealTrigger }) => {
-    const { _id, question, answer } = joke;
-    const [doReveal, setDoReveal] = useState<boolean>(reveal);
-    const [updatedJoke, setUpdatedJoke] = useState<IJokeModel>(joke); // Локальне збереження жарту
+const JokeComponent: FC<IProps> = ({ joke, onJokeUpdate, onDelete, onNextJoke }) => {
+    const { _id, question, answer, votes } = joke;
+    const [revealAnswer, setRevealAnswer] = useState(false);
+    const [revealForm, setRevealForm] = useState(false);
 
-    // Скидання `doReveal` при зміні `resetRevealTrigger`
     useEffect(() => {
-        setDoReveal(false);
-    }, [resetRevealTrigger]);
-
-    // Оновлення жарту при зміні `joke` (новий жарт)
-    useEffect(() => {
-        setUpdatedJoke(joke);
+        setRevealAnswer(false);
     }, [joke]);
 
-    const revealAnswer = () => {
-        setDoReveal(prev=>!(prev));
-    };
+    const toggleAnswer = () => setRevealAnswer((prev) => !prev);
+    const toggleForm = () => setRevealForm((prev) => !prev);
 
+    // Голосування за жарт
     const voteForIt = async (label: string) => {
         try {
-            const updated = await jokeService.voteForJoke(_id, label);
-            setUpdatedJoke(updated); // Оновлення стану з оновленими голосами
+            const updatedJoke = await jokeService.voteForJoke(_id, label);
+            onJokeUpdate(updatedJoke); // Оновлюємо стан жарту після голосування
         } catch (error) {
             console.error("Error voting:", error);
         }
@@ -39,22 +35,23 @@ const JokeComponent: FC<IProps> = ({ joke, reveal = false, resetRevealTrigger })
 
     return (
         <div>
-            <div style={{ height: 90, backgroundColor: "#fdabbe", paddingLeft:20, paddingTop:5, paddingBottom:10}}>
-                <p>{_id}</p>
-                <h2 onDoubleClick={revealAnswer}>
-                    {question}
-                </h2>
+            <div style={{ backgroundColor: "#fdabbe", padding: 10 }}>
+                <h2 onDoubleClick={toggleAnswer}>{question}</h2>
             </div>
 
-            {doReveal ? <h2>{answer}</h2> : <p></p>}
+            {revealAnswer && <h3>{answer}</h3>}
 
-
-            <div style={{display:"flex", flexWrap:"wrap"}}>
-                {updatedJoke.votes.map((vote) => (
-                    <VoteComponent vote={vote} key={vote._id} voteForIt={voteForIt} />
+            <div style={{ display: "flex", gap: 10 }}>
+                {votes.map((vote) => (
+                    <VoteComponent key={vote._id} vote={vote} voteForIt={voteForIt} />
                 ))}
             </div>
 
+            <button onClick={toggleForm}>Update</button>
+            {revealForm && <JokeUpdateFormComponent joke={joke} onJokeUpdate={onJokeUpdate} />}
+
+            {onNextJoke && <button onClick={onNextJoke}>Next</button>}
+            <button onClick={() => onDelete(_id)}>Delete</button>
         </div>
     );
 };

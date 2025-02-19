@@ -3,67 +3,42 @@ import { IJokeModel } from "../models/IJokeModel.tsx";
 import { jokeService } from "../services/apiservice.tsx";
 import JokeComponent from "./JokeComponent.tsx";
 
-const dummyJoke = {
-    _id: "67b634e07c5a87d88efbc584",
-    question: "Dummy question",
-    answer: "Dummy answer",
-    votes: [
-        { value: 0, label: "😂" },
-        { value: 0, label: "👍" },
-        { value: 0, label: "❤️" },
-    ],
-};
-
 const SingleJokeComponent = () => {
-    const [joke, setJoke] = useState<IJokeModel>(dummyJoke);
-    const [show, setShow] = useState<boolean>(true);
-    const [resetTrigger, setResetTrigger] = useState<number>(0); // Тригер для resetReveal
+    const [joke, setJoke] = useState<IJokeModel | null>(null);
 
     useEffect(() => {
-        nextJoke();
+        loadNewJoke();
     }, []);
 
-    const nextJoke = async () => {
-        try {
-            const nextJoke = await jokeService.getJoke();
-            setJoke(nextJoke);
-            setResetTrigger((prev) => prev + 1); // Оновлюємо тригер, щоб скинути reveal
-        } catch (error) {
-            console.error("Error fetching next joke:", error);
-        }
+    const loadNewJoke = async () => {
+        const newJoke = await jokeService.getJoke();
+        setJoke(newJoke);
     };
 
-    const deleteJoke = async () => {
-        try {
-            await jokeService.deleteJoke(joke._id);
-            setShow(false);
+    const updateJoke = (updatedJoke: IJokeModel) => {
+        setJoke(updatedJoke);
+    };
 
-            setTimeout(async () => {
-                await nextJoke();
-                setShow(true);
-            }, 1200);
+    const deleteJoke = async (id: string) => {
+        try {
+            await jokeService.deleteJoke(id);
+            loadNewJoke();
         } catch (error) {
-            console.error("Error deleting:", error);
+            console.error("Error deleting joke:", error);
         }
     };
 
     return (
         <div>
-            {show ? (
-                joke ? (
-                    <>
-                        <JokeComponent joke={joke} resetRevealTrigger={resetTrigger} />
-                        <button onClick={nextJoke}>Next</button>
-                        <button onClick={deleteJoke}>Delete</button>
-                    </>
-                ) : (
-                    <p>No more jokes!</p>
-                )
+            {joke ? (
+                <JokeComponent
+                    joke={joke}
+                    onJokeUpdate={updateJoke}
+                    onDelete={deleteJoke}
+                    onNextJoke={loadNewJoke}
+                />
             ) : (
-                <>
-                    <p>This joke was successfully deleted</p>
-                    <p>Looking for next joke...</p>
-                </>
+                <p>No more jokes!</p>
             )}
         </div>
     );
