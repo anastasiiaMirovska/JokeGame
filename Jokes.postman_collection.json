@@ -1,0 +1,146 @@
+{
+	"info": {
+		"_postman_id": "e8801dee-fddc-46b7-b3a2-cb3853e93051",
+		"name": "Jokes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36483168"
+	},
+	"item": [
+		{
+			"name": "getJoke",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/joke",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"joke"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getAllJokes",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/joke/all",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"joke",
+						"all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "voteForJoke",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "emoji",
+							"value": "😂",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:5000/api/joke/:id",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"joke",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "67b64372be23fdd4fcd06653"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "deleteJoke",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:5000/api/joke/:id",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"joke",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "67b5c757115f3814366a9b4a"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"question\": \"Question\",\r\n    \"answer\": \"Answer\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:5000/api/joke/:id",
+					"host": [
+						"localhost"
+					],
+					"port": "5000",
+					"path": [
+						"api",
+						"joke",
+						":id"
+					],
+					"variable": [
+						{
+							"key": "id",
+							"value": "67b5c757115f3814366a9b4a"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
