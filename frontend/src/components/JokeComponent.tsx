@@ -18,6 +18,7 @@ const JokeComponent: FC<IProps> = ({joke, onJokeUpdate, onDelete, onNextJoke}) =
 
     useEffect(() => {
         setRevealAnswer(false);
+        setRevealForm(false);
     }, [joke]);
 
     const toggleAnswer = () => setRevealAnswer((prev) => !prev);
