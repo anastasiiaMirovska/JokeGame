@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { IJokeModel } from "../models/IJokeModel.tsx";
-import { jokeService } from "../services/apiservice.ts";
+import {useEffect, useState} from "react";
+import {IJokeModel} from "../models/IJokeModel.tsx";
+import {jokeService} from "../services/apiservice.ts";
 import JokeComponent from "./JokeComponent.tsx";
 
 const SingleJokeComponent = () => {

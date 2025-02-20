@@ -27,7 +27,7 @@ const jokeSchema = new Schema({
     //     type: [String],
     //     default: ["😂", "👍", "❤️"]
     // }
-}, { timestamps: true })
+}, {timestamps: true})
 
 module.exports = model('jokes', jokeSchema)
 

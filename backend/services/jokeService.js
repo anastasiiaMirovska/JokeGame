@@ -6,7 +6,6 @@ const fetchAndSaveJokes = async () => {
         const response = await axios.get('https://teehee.dev/api/joke');
         const jokeData = response.data;
 
-        // Перевіряємо, чи є жарт в базі даних за полями question та answer
         const existingJoke = await Jokes.findOne({
             question: jokeData.question,
             answer: jokeData.answer
@@ -18,7 +17,7 @@ const fetchAndSaveJokes = async () => {
             const joke = {
                 question: jokeData.question,
                 answer: jokeData.answer,
-                votes:[
+                votes: [
                     {
                         value: 0,
                         label: "😂",
@@ -47,10 +46,9 @@ const fetchAndSaveJokes = async () => {
 };
 
 
-
 const fetchMultipleJokes = async (count) => {
     for (let i = 0; i < count; i++) {
         await fetchAndSaveJokes(); // Викликаємо fetchAndSaveJokes
     }
 };
-module.exports = { fetchMultipleJokes, fetchAndSaveJokes };
+module.exports = {fetchMultipleJokes, fetchAndSaveJokes};

@@ -1,15 +1,15 @@
-import { FC } from "react";
-import { useForm } from "react-hook-form";
-import { IJokeModel } from "../models/IJokeModel.tsx";
-import { jokeService } from "../services/apiservice.ts";
+import {FC} from "react";
+import {useForm} from "react-hook-form";
+import {IJokeModel} from "../models/IJokeModel.tsx";
+import {jokeService} from "../services/apiservice.ts";
 
 interface IProps {
     joke: IJokeModel;
     onJokeUpdate: (updatedJoke: IJokeModel) => void;
 }
 
-const JokeUpdateFormComponent: FC<IProps> = ({ joke, onJokeUpdate }) => {
-    const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<IJokeModel>({
+const JokeUpdateFormComponent: FC<IProps> = ({joke, onJokeUpdate}) => {
+    const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<IJokeModel>({
         defaultValues: {
             question: joke.question,
             answer: joke.answer,
@@ -33,7 +33,7 @@ const JokeUpdateFormComponent: FC<IProps> = ({ joke, onJokeUpdate }) => {
                 <div className="mb-4">
                     <label className="label">Question:</label>
                     <input
-                        {...register("question", { required: "Question is required" })}
+                        {...register("question", {required: "Question is required"})}
                         type="text"
                         className="input"
                     />
@@ -43,7 +43,7 @@ const JokeUpdateFormComponent: FC<IProps> = ({ joke, onJokeUpdate }) => {
                 <div className="mb-4">
                     <label className="label">Answer:</label>
                     <input
-                        {...register("answer", { required: "Answer is required" })}
+                        {...register("answer", {required: "Answer is required"})}
                         type="text"
                         className="input"
                     />

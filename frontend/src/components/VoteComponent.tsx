@@ -1,13 +1,15 @@
 import {FC} from "react";
 import {IVoteModel} from "../models/IJokeModel.tsx";
+
 interface IProps {
     vote: IVoteModel,
-    voteForIt:(label:string)=>void
+    voteForIt: (label: string) => void
 }
-const VoteComponent:FC<IProps> = ({vote, voteForIt}) => {
+
+const VoteComponent: FC<IProps> = ({vote, voteForIt}) => {
     const {value, label} = vote;
     return (
-        <div onClick={()=>{
+        <div onClick={() => {
             voteForIt(label)
         }} style={{backgroundColor: "#dfeeab"}} className={"voteBox"}>
             <span>{label}</span>

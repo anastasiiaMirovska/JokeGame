@@ -7,7 +7,7 @@ export interface IJokeModel {
     updatedAt?: Date,
 }
 
-export interface IVoteModel{
+export interface IVoteModel {
     _id?: string,
     value: number,
     label: string
