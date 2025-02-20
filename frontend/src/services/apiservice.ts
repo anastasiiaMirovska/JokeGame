@@ -1,5 +1,5 @@
 import axios from "axios";
-import {baseURL, urls} from "../constants/urls"
+import {baseURL, urls} from "../constants/urls.ts"
 import {IJokeModel} from "../models/IJokeModel.tsx";
 
 const axiosInstance = axios.create(

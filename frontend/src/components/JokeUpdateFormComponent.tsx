@@ -1,7 +1,7 @@
 import { FC } from "react";
 import { useForm } from "react-hook-form";
 import { IJokeModel } from "../models/IJokeModel.tsx";
-import { jokeService } from "../services/apiservice.tsx";
+import { jokeService } from "../services/apiservice.ts";
 
 interface IProps {
     joke: IJokeModel;
@@ -26,31 +26,39 @@ const JokeUpdateFormComponent: FC<IProps> = ({ joke, onJokeUpdate }) => {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} style={{ marginBottom: 20 }}>
-            <div>
-                <label>Question:</label>
-                <input
-                    {...register("question", { required: "Question is required" })}
-                    type="text"
-                    style={{ width: "100%", padding: 8, marginBottom: 10 }}
-                />
-                {errors.question && <p style={{ color: "red" }}>{errors.question.message}</p>}
-            </div>
+        <div className="flex justify-center w-full m-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="form">
+                <h2 className="text-xl font-bold mb-4 text-center">Update Joke</h2>
 
-            <div>
-                <label>Answer:</label>
-                <input
-                    {...register("answer", { required: "Answer is required" })}
-                    type="text"
-                    style={{ width: "100%", padding: 8, marginBottom: 10 }}
-                />
-                {errors.answer && <p style={{ color: "red" }}>{errors.answer.message}</p>}
-            </div>
+                <div className="mb-4">
+                    <label className="label">Question:</label>
+                    <input
+                        {...register("question", { required: "Question is required" })}
+                        type="text"
+                        className="input"
+                    />
+                    {errors.question && <p className="text-red-500 text-sm mt-1">{errors.question.message}</p>}
+                </div>
 
-            <button type="submit" disabled={isSubmitting} style={{ padding: 10, backgroundColor: "#4caf50", color: "white", border: "none", cursor: "pointer" }}>
-                {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
-        </form>
+                <div className="mb-4">
+                    <label className="label">Answer:</label>
+                    <input
+                        {...register("answer", { required: "Answer is required" })}
+                        type="text"
+                        className="input"
+                    />
+                    {errors.answer && <p className="text-red-500 text-sm mt-1">{errors.answer.message}</p>}
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="input"
+                >
+                    {isSubmitting ? "Saving..." : "Save Changes"}
+                </button>
+            </form>
+        </div>
     );
 };
 

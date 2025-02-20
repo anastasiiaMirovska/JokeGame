@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IJokeModel } from "../models/IJokeModel.tsx";
-import { jokeService } from "../services/apiservice.tsx";
+import { jokeService } from "../services/apiservice.ts";
 import JokeComponent from "./JokeComponent.tsx";
 
 const AllJokesComponent = () => {
@@ -37,7 +37,7 @@ const AllJokesComponent = () => {
                     />
                 ))
             ) : (
-                <p>No more jokes!</p>
+                <div className={"flex justify-center"}><p className={"p"}>No more jokes!</p></div>
             )}
         </div>
     );

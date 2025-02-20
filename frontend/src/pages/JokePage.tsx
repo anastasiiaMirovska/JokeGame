@@ -1,5 +1,5 @@
 import {NavLink, Outlet} from "react-router-dom";
-import {jokeService} from "../services/apiservice.tsx";
+import {jokeService} from "../services/apiservice.ts";
 
 const JokePage = () => {
     const addNewJokes = ()=>{
@@ -12,14 +12,14 @@ const JokePage = () => {
     }
     return (
 
-        <div>
-            <h1>JokePage</h1>
-            <button onClick={addNewJokes} style={{margin:10}}>Add new jokes</button>
-            <div style={{ margin: 20 }}>
-                <NavLink  to="single" style={({ isActive }) => ({ backgroundColor: isActive ? '#dfeeab' : '#e6e6e1' })} >
+        <div className={"flex w-full flex-wrap flex-col "}>
+            <div className={"flex justify-center"}><button onClick={addNewJokes} className={"button"}>Add new jokes</button></div>
+            <div className={"flex justify-center"}><p className={"p"}> To reveal answer - double click on the joke</p></div>
+            <div className={"flex justify-center m-3"}>
+                <NavLink  to="single" className={"navLink text-xl"}>
                     Single Jokes
                 </NavLink >
-                <NavLink  to="all" style={({ isActive }) => ({ backgroundColor: isActive ? '#dfeeab' : '#e6e6e1' })}>
+                <NavLink  to="all" className={"navLink text-xl"}>
                     All Jokes
                 </NavLink >
             </div>

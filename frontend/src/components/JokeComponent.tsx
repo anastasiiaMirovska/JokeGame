@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from "react";
 import { IJokeModel } from "../models/IJokeModel.tsx";
-import { jokeService } from "../services/apiservice.tsx";
+import { jokeService } from "../services/apiservice.ts";
 import VoteComponent from "./VoteComponent.tsx";
 import JokeUpdateFormComponent from "./JokeUpdateFormComponent.tsx";
 
@@ -34,38 +34,32 @@ const JokeComponent: FC<IProps> = ({ joke, onJokeUpdate, onDelete, onNextJoke })
     };
 
     return (
-        <div>
-            <div style={{ backgroundColor: "#fdabbe", padding: 10 }}>
-                <h2 onDoubleClick={toggleAnswer}>{question}</h2>
+        <div className={"m-6"}>
+            <div className={"w-full flex justify-center"}>
+                <div className={"jokeBox"} onDoubleClick={toggleAnswer}>
+                <h2 className={"h2"}>{question}</h2>
+                    {revealAnswer && <h2>{answer}</h2>}
+                </div>
             </div>
 
-            {revealAnswer && <h3>{answer}</h3>}
 
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className={"flex justify-center"}>
                 {votes.map((vote) => (
                     <VoteComponent key={vote._id} vote={vote} voteForIt={voteForIt} />
                 ))}
             </div>
+            <div className={"flex justify-center flex-wrap"}>
+                <button onClick={toggleForm} className={"sbutton"}>Update</button>
+                {revealForm && <JokeUpdateFormComponent joke={joke} onJokeUpdate={onJokeUpdate} />}
 
-            <button onClick={toggleForm}>Update</button>
-            {revealForm && <JokeUpdateFormComponent joke={joke} onJokeUpdate={onJokeUpdate} />}
+                {onNextJoke && <button onClick={onNextJoke} className={"sbutton"}>Next</button>}
+                <button onClick={() => onDelete(_id)} className={"sbutton"}>Delete</button>
+            </div>
 
-            {onNextJoke && <button onClick={onNextJoke}>Next</button>}
-            <button onClick={() => onDelete(_id)}>Delete</button>
         </div>
     );
 };
 
 export default JokeComponent;
-
-// const changeJoke = async()=>{
-//     try{
-//         const updated = await jokeService.changeJoke(_id, question, answer);
-//         setUpdatedJoke(updated);
-//     }
-//     catch (error){
-//         console.error("Error changing:", error);
-//     }
-// }
 
 

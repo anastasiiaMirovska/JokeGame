@@ -9,7 +9,7 @@ const VoteComponent:FC<IProps> = ({vote, voteForIt}) => {
     return (
         <div onClick={()=>{
             voteForIt(label)
-        }} style={{height:50, width:70, margin:10, backgroundColor: "#dfeeab"}}>
+        }} style={{backgroundColor: "#dfeeab"}} className={"voteBox"}>
             <span>{label}</span>
             <span>{value}</span>
         </div>
