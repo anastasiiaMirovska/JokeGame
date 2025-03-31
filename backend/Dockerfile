@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-LABEL key = MyImage
+LABEL key=MyImage
 
 RUN mkdir /app
 WORKDIR /app
