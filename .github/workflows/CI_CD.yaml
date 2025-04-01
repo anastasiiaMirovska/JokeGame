@@ -1,52 +1,43 @@
+
 name: CI/CD Pipeline
 
 on:
   push:
     branches:
-      - master
-
+      - main
   pull_request:
     branches:
-      - master
-
+      - main
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout репозиторій
+      - name: Клонуємо репозиторій
         uses: actions/checkout@v4
 
       - name: Встановлення Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
-
-      - name: Встановлення залежностей для фронтенду
-        run: |
-          cd frontend
-          npm ci
-          npm run build
-
-      - name: Встановлення залежностей для бекенду
-        run: |
-          cd backend
-          npm ci
+          node-version: '18'
 
       - name: Створення .env для бекенду
         run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
 
-      - name: Запуск тестів
-        run: |
-          cd backend
-          npm run test
+      - name: 🛠 Встановлення залежностей для бекенду
+        run: cd backend && npm ci
 
       - name: Запуск Docker контейнерів
         run: docker compose up -d --build
 
-      - name: Очікування запуску сервісів
-        run: sleep 10
+      - name: ⏳ Очікування підняття MongoDB
+        run: |
+          echo "Waiting for MongoDB to start..."
+          until nc -z db 27017; do sleep 1; done
+          echo "MongoDB is up!"
 
-      - name: Зупинка Docker контейнерів
-        run: docker-compose down
+      - name: Запуск тестів
+        run: cd backend && npm run test
+
 
