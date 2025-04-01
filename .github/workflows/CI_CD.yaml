@@ -33,6 +33,9 @@ jobs:
           cd backend
           npm ci
 
+      - name: Створення .env для бекенду
+        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+
       - name: Запуск Docker контейнерів
         run: docker compose up -d --build
 
