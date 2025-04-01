@@ -7,7 +7,7 @@ describe('Jokes API', () => {
 
     beforeAll(async () => {
         // Підключаємося до бази даних, що працює в Docker на порту 27018
-        await mongoose.connect('mongodb://user:user@localhost:27018/my_database?authSource=admin', {
+        await mongoose.connect('mongodb://user:user@localhost:27017/my_database?authSource=admin', {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
