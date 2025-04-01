@@ -42,12 +42,12 @@ jobs:
       - name: Очікування запуску сервісів
         run: sleep 10
 
-      - name: Зупинка Docker контейнерів
-        run: docker compose down
-
       - name: Запуск тестів
         run: |
           cd backend
           npm run test
+
+      - name: Зупинка Docker контейнерів
+        run: docker compose down
 
 

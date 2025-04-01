@@ -6,10 +6,12 @@ const req = require("express/lib/request");
 describe('Jokes API', () => {
 
     beforeAll(async () => {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://user:user@localhost:27018/my_database?authSource=admin';
-        await mongoose.connect(mongoUri);
+        // Підключаємося до бази даних, що працює в Docker на порту 27018
+        await mongoose.connect('mongodb://user:user@localhost:27018/my_database?authSource=admin', {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
     });
-
 
     afterAll(async () => {
         // Закриваємо підключення до бази даних після завершення тестів
