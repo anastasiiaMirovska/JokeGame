@@ -34,7 +34,7 @@ jobs:
           npm ci
 
       - name: Запуск Docker контейнерів
-        run: docker-compose up -d --build
+        run: docker compose up -d --build
 
       - name: Очікування запуску сервісів
         run: sleep 10

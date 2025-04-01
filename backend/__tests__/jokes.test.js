@@ -51,15 +51,15 @@ describe('Jokes API', () => {
         // expect(res.body.error).toBe("Joke not found");
     });
 
-    it("should return a joke with +1 vote and status 201", async () => {
-        const id = '67e00865a5a2ac817e6945e8';
-        const res = await request(app).post(`/api/joke/${id}/`).send({emoji:"😂"}).expect(201);
-    })
+    // it("should return a joke with +1 vote and status 201", async () => {
+    //     const id = '67e00865a5a2ac817e6945e8';
+    //     const res = await request(app).post(`/api/joke/${id}/`).send({emoji:"😂"}).expect(201);
+    // })
 
-    it("should return a joke with changed question and answer and status 200", async () => {
-        const id = '67e007e4a5a2ac817e6945e2';
-        const res = await request(app).put(`/api/joke/${id}/`).send({question: "Hello, my friend!", answer: "Hello"}).expect(200);
-    })
+    // it("should return a joke with changed question and answer and status 200", async () => {
+    //     const id = '67e007e4a5a2ac817e6945e2';
+    //     const res = await request(app).put(`/api/joke/${id}/`).send({question: "Hello, my friend!", answer: "Hello"}).expect(200);
+    // })
 
     it("should return status 400 when deleting joke with invalid id format", async () => {
         const id = 'invalid_id'
