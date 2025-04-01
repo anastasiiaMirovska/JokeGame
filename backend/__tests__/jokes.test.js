@@ -6,7 +6,7 @@ const req = require("express/lib/request");
 describe('Jokes API', () => {
 
     beforeAll(async () => {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://user:user@db:27017/my_database?authSource=admin';
+        const mongoUri = process.env.MONGO_URI || 'mongodb://user:user@localhost:27018/my_database?authSource=admin';
         await mongoose.connect(mongoUri);
     });
 
