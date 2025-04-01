@@ -36,16 +36,16 @@ jobs:
       - name: Створення .env для бекенду
         run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
 
+      - name: Запуск тестів
+        run: |
+          cd backend
+          npm run test
+
       - name: Запуск Docker контейнерів
         run: docker compose up -d --build
 
       - name: Очікування запуску сервісів
         run: sleep 10
-
-      - name: Запуск тестів
-        run: |
-          cd backend
-          npm run test
 
       - name: Зупинка Docker контейнерів
         run: docker-compose down
