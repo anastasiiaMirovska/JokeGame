@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout репозиторій
+        uses: actions/checkout@v4
+
+      - name: Встановлення Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Встановлення залежностей для фронтенду
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Встановлення залежностей для бекенду
+        run: |
+          cd backend
+          npm ci
+
+      - name: Запуск Docker контейнерів
+        run: docker-compose up -d --build
+
+      - name: Очікування запуску сервісів
+        run: sleep 10
+
+      - name: Запуск тестів
+        run: |
+          cd backend
+          npm run test
+
+      - name: Зупинка Docker контейнерів
+        run: docker-compose down
+
