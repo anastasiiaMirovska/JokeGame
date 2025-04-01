@@ -43,7 +43,7 @@ jobs:
         run: sleep 10
 
       - name: Зупинка Docker контейнерів
-        run: docker-compose down
+        run: docker compose down
 
       - name: Запуск тестів
         run: |
