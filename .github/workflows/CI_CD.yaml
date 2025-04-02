@@ -18,7 +18,7 @@ jobs:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: user
           # I think MONOGDB_INITDB_DATABASE has no effect in here (see https://hub.docker.com/_/mongo, section MONGO_INITDB_DATABASE)
-          MONGO_INITDB_DATABASE: my_database
+          MONGO_INITDB_DATABASE: jokes_test
         ports:
           - 27017:27017
         options: >-
