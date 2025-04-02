@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const setupTestDB = () => {
     beforeAll(async () => {
-        const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/joke_test';
+        const mongoUri = 'mongodb://user:user@localhost:27018/my_database?authSource=admin';
         await mongoose.connect(mongoUri, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
