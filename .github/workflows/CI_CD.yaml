@@ -52,13 +52,13 @@ jobs:
           sudo apt-get install -y mongodb-mongosh
           mongosh --version
 
-#      - name: Initalize MongoDB
-#        run: |
-#          mongosh --host localhost:27018 -u admin -p admin --authenticationDatabase admin <<EOF
-#            db = db.getSiblingDB('my_database');
-#            db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });
-#            db.createCollection('jokes');
-#          EOF
+      - name: Initalize MongoDB
+        run: |
+          mongosh --host localhost:27018 -u user -p user --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('my_database');
+            db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });
+            db.createCollection('jokes');
+          EOF
 
       - name: Запуск тестів
         run: |
