@@ -54,7 +54,7 @@ jobs:
 
       - name: Initalize MongoDB
         run: |
-          mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
+          mongosh --host localhost:27018 -u admin -p admin --authenticationDatabase admin <<EOF
             db = db.getSiblingDB('my_database');
             db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'APP-DB' }] })
             db.createCollection('jokes');
