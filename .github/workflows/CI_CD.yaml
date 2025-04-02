@@ -9,10 +9,23 @@ on:
     branches:
       - master
 
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: mongo:6.0
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: example
+        options: >-
+          --health-cmd "mongosh --eval 'db.serverStatus()'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - name: Checkout репозиторій
         uses: actions/checkout@v4
@@ -34,20 +47,84 @@ jobs:
           npm ci
 
       - name: Створення .env для бекенду
-        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+        run: |
+          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+          echo "MONGODB_URI=mongodb://root:example@localhost:27017" >> backend/.env
 
-      - name: Запуск Docker контейнерів
-        run: docker compose up -d --build
+      - name: Збірка та запуск додатку
+        run: |
+          docker build -t joke-app ./backend
+          docker run -d --name joke-app \
+            -p 3000:3000 \
+            -e MONGODB_URI=mongodb://root:example@host.docker.internal:27017 \
+            joke-app
 
-      - name: Очікування запуску сервісів
-        run: sleep 10
+      - name: Очікування запуску додатку
+        run: |
+          echo "Waiting for application to be ready..."
+          sleep 5
+          curl -f http://localhost:3000/api/joke/ || exit 1
+          echo "Application is ready!"
 
       - name: Запуск тестів
         run: |
           cd backend
           npm run test
 
-      - name: Зупинка Docker контейнерів
-        run: docker compose down
+      - name: Очищення Docker контейнерів
+        run: docker rm -f joke-app
 
 
+#name: CI/CD Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#
+#  pull_request:
+#    branches:
+#      - master
+#
+#
+#jobs:
+#  build-and-test:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout репозиторій
+#        uses: actions/checkout@v4
+#
+#      - name: Встановлення Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 18
+#
+#      - name: Встановлення залежностей для фронтенду
+#        run: |
+#          cd frontend
+#          npm ci
+#          npm run build
+#
+#      - name: Встановлення залежностей для бекенду
+#        run: |
+#          cd backend
+#          npm ci
+#
+#      - name: Створення .env для бекенду
+#        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+#
+#      - name: Запуск Docker контейнерів
+#        run: docker compose up -d --build
+#
+#      - name: Очікування запуску сервісів
+#        run: sleep 10
+#
+#      - name: Запуск тестів
+#        run: |
+#          cd backend
+#          npm run test
+#
+#      - name: Зупинка Docker контейнерів
+#        run: docker compose down
+#
+#
