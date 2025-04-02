@@ -12,16 +12,17 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
     services:
-      mongo:
-        image: mongo:6.0
-        ports:
-          - 27018:27017
+      mongodb:
+        image: mongo:latest
         env:
-          MONGO_INITDB_DATABASE: my_database
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: user
+          # I think MONOGDB_INITDB_DATABASE has no effect in here (see https://hub.docker.com/_/mongo, section MONGO_INITDB_DATABASE)
+          MONGO_INITDB_DATABASE: my_database
+        ports:
+          - 27017:27017
         options: >-
-          --health-cmd 'mongo --eval "db.adminCommand(\"ping\")"'
+          --health-cmd mongo
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -49,7 +50,7 @@ jobs:
       - name: Створення .env для бекенду
         run: |
           echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-          echo "MONGODB_URI=mongodb://user:user@localhost:27018/my_database?authSource=admin" >> backend/.env
+          echo "MONGODB_URI=mongodb://user:user@localhost:27017/my_database?authSource=admin" >> backend/.env
 
       - name: Очікування запуску MongoDB
         run: |
