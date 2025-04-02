@@ -16,17 +16,7 @@ jobs:
         image: mongo:latest
         ports:
           - 27018:27017
-        options: >
-          --restart unless-stopped 
-          --noauth
-        # Можна також додати змінну середовища для MongoDB
-        env:
-          MONGO_INITDB_ROOT_USERNAME: user
-          MONGO_INITDB_ROOT_PASSWORD: user
-        # Можна додати затримку, щоб дати MongoDB достатньо часу для старту
-        # Затримка, таким чином, дозволяє MongoDB завершити свою ініціалізацію
-        # перед виконанням подальших кроків
-          timeout: 30
+
 
     steps:
       - name: Checkout репозиторій
@@ -63,11 +53,13 @@ jobs:
           sudo apt-get install -y mongodb-mongosh
           mongosh --version
 
-      - name: Wait for MongoDB
+      - name: Initalize MongoDB
         run: |
-          while ! nc -z localhost 27018; do
-          sleep 1
-          done
+          mongosh --host localhost:27018 -u user -p user --authenticationDatabase admin <<EOF
+            db = db.getSiblingDB('my_database');
+            db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });
+            db.createCollection('jokes');
+          EOF
 
       - name: Запуск тестів
         run: |
