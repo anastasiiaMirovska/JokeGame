@@ -22,13 +22,8 @@ jobs:
           MONGO_INITDB_ROOT_PASSWORD: user
 
     steps:
-      - name: Check out code
+      - name: Checkout репозиторій
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
 
       - name: Install dependencies
         run: |
