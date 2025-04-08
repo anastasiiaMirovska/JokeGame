@@ -11,11 +11,6 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-#    services:
-#      mongodb:
-#        image: mongo:latest
-#        ports:
-#          - 27018:27017
 
     steps:
       - name: Checkout репозиторій
@@ -26,19 +21,65 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Зупинка запущених контейнерів (якщо є)
+        run: docker-compose down || true
+
       - name: Створення .env для бекенду
         run: |
           echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-          echo "MONGODB_URI=mongodb://user:user@db:27017/my_database?authSource=admin" >> backend/.env
+          echo "MONGODB_URI=mongodb://db:27017/my_database?authSource=admin" >> backend/.env
 
       - name: Запуск Docker-контейнерів
         run: docker-compose up -d --build
 
-#      - name: Очікування запуску сервісів
-#        run: sleep 20  # Дати час контейнерам піднятися
-#
-      - name: Запуск тестів у контейнері
-        run: docker exec jokegame_app_1 npm test
+      - name: Виведення логів Docker
+        run: docker-compose logs -f
 
       - name: Завершення контейнерів
         run: docker-compose down
+
+
+#name: CI/CD Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
+#
+#jobs:
+#  build-and-test:
+#    runs-on: ubuntu-latest
+##    services:
+##      mongodb:
+##        image: mongo:latest
+##        ports:
+##          - 27018:27017
+#
+#    steps:
+#      - name: Checkout репозиторій
+#        uses: actions/checkout@v4
+#
+#      - name: Встановлення Docker Compose
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y docker-compose
+#
+#      - name: Створення .env для бекенду
+#        run: |
+#          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+#          echo "MONGODB_URI=mongodb://user:user@db:27017/my_database?authSource=admin" >> backend/.env
+#
+#      - name: Запуск Docker-контейнерів
+#        run: docker-compose up -d --build
+#
+##      - name: Очікування запуску сервісів
+##        run: sleep 20  # Дати час контейнерам піднятися
+##
+#      - name: Запуск тестів у контейнері
+#        run: docker exec jokegame_app_1 npm test
+#
+#      - name: Завершення контейнерів
+#        run: docker-compose down
