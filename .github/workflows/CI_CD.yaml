@@ -14,6 +14,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Create MongoDB initialization directory
         run: |
           mkdir -p ./backend/.dataBase
@@ -36,23 +39,23 @@ jobs:
           sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
 
       - name: Start Docker Compose services
-        run: docker-compose up -d
+        run: docker compose up -d
 
       - name: Wait for MongoDB to be ready
         run: |
-          docker-compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
           sleep 20
+          docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
 
       - name: Run tests
-        run: docker-compose exec -T app npm test
+        run: docker compose exec -T app npm test
 
       - name: Display logs if tests fail
         if: failure()
-        run: docker-compose logs
+        run: docker compose logs
 
       - name: Clean up
         if: always()
-        run: docker-compose down -v
+        run: docker compose down -v
 
 #name: CI/CD Pipeline
 #
