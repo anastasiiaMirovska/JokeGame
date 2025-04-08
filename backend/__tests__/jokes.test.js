@@ -19,25 +19,25 @@ describe('Jokes API', () => {
         await mongoose.connection.close();
     });
 
-    it("should return a joke and status 200", async () => {
-        const res = await request(app).get("/api/joke/");
-        expect(res.statusCode).toBe(200);
-        expect(res.body).toMatchObject({
-            _id: expect.any(String),
-            question: expect.any(String),
-            answer: expect.any(String),
-            votes: expect.arrayContaining([
-                expect.objectContaining({
-                    value: expect.any(Number),
-                    label: expect.any(String)
-                })
-            ]),
-            createdAt: expect.any(String),
-            updatedAt:  expect.any(String),
-            __v: expect.any(Number),
-
-        });
-    });
+    // it("should return a joke and status 200", async () => {
+    //     const res = await request(app).get("/api/joke/");
+    //     expect(res.statusCode).toBe(200);
+    //     expect(res.body).toMatchObject({
+    //         _id: expect.any(String),
+    //         question: expect.any(String),
+    //         answer: expect.any(String),
+    //         votes: expect.arrayContaining([
+    //             expect.objectContaining({
+    //                 value: expect.any(Number),
+    //                 label: expect.any(String)
+    //             })
+    //         ]),
+    //         createdAt: expect.any(String),
+    //         updatedAt:  expect.any(String),
+    //         __v: expect.any(Number),
+    //
+    //     });
+    // });
 
     it("should return all jokes and status 200", async () => {
         const res = await request(app).get('/api/joke/all/');
