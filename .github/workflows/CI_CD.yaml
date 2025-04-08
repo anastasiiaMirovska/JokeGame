@@ -10,11 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-      MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-      MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,14 +21,22 @@ jobs:
         run: |
           mkdir -p ./backend/.dataBase
           touch ./backend/.dataBase/mongo-init.js
-          echo "db = db.getSiblingDB('$MONGO_DATABASE');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: '$MONGO_USERNAME', pwd: '$MONGO_PASSWORD', roles: [{ role: 'readWrite', db: '$MONGO_DATABASE' }] });" >> ./backend/.dataBase/mongo-init.js
+          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Create .env file
         run: |
-          echo "MONGO_USERNAME=$MONGO_USERNAME" > ./backend/.env
-          echo "MONGO_PASSWORD=$MONGO_PASSWORD" >> ./backend/.env
-          echo "MONGO_DATABASE=$MONGO_DATABASE" >> ./backend/.env
+          echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
+          echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
+          echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
+
+#      - name: Fix MongoDB connection string in test file
+#        run: |
+#          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
+#
+#      - name: Increase Jest timeout in test file
+#        run: |
+#          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
 
       - name: Start Docker Compose services
         run: docker compose up -d
@@ -41,7 +44,7 @@ jobs:
       - name: Wait for MongoDB to be ready
         run: |
           sleep 20
-          docker compose exec -T db mongosh -u $MONGO_USERNAME -p $MONGO_PASSWORD --eval "db.adminCommand('ping')" || true
+          docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
 
       - name: Run tests
         run: docker compose exec -T app npm test
@@ -53,129 +56,6 @@ jobs:
       - name: Clean up
         if: always()
         run: docker compose down -v
-
-
-#name: Jokes API Test
-#
-#on:
-#  push:
-#    branches: [ main, master ]
-#  pull_request:
-#    branches: [ main, master ]
-#
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v3
-#
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v2
-#
-#      - name: Create MongoDB initialization directory
-#        run: |
-#          mkdir -p ./backend/.dataBase
-#          touch ./backend/.dataBase/mongo-init.js
-#          echo "db = db.getSiblingDB('${{ secrets.MONGO_DATABASE }}');" > ./backend/.dataBase/mongo-init.js
-#          echo "db.createUser({ user: '${{ secrets.MONGO_USERNAME }}', pwd: '${{ secrets.MONGO_PASSWORD }}', roles: [{ role: 'readWrite', db: '${{ secrets.MONGO_DATABASE }}' }] });" >> ./backend/.dataBase/mongo-init.js
-#
-#      - name: Create .env file
-#        run: |
-#          echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_USERNAME }}" > ./backend/.env
-#          echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_PASSWORD }}" >> ./backend/.env
-#          echo "MONGO_INITDB_DATABASE=${{ secrets.MONGO_DATABASE }}" >> ./backend/.env
-#
-#      - name: Start Docker Compose services
-#        run: |
-#          MONGO_USERNAME=${{ secrets.MONGO_USERNAME }} \
-#          MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
-#          MONGO_DATABASE=${{ secrets.MONGO_DATABASE }} \
-#          docker compose up -d
-#
-#      - name: Wait for MongoDB to be ready
-#        run: |
-#          sleep 20
-#          docker compose exec -T db mongosh -u ${{ secrets.MONGO_USERNAME }} -p ${{ secrets.MONGO_PASSWORD }} --eval "db.adminCommand('ping')" || true
-#
-#      - name: Run tests
-#        run: docker compose exec -T app npm test
-#        env:
-#          MONGO_USERNAME: ${{ secrets.MONGO_USERNAME }}
-#          MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#          MONGO_DATABASE: ${{ secrets.MONGO_DATABASE }}
-#
-#      - name: Display logs if tests fail
-#        if: failure()
-#        run: docker compose logs
-#
-#      - name: Clean up
-#        if: always()
-#        run: docker compose down -v
-
-
-
-
-
-#name: Jokes API Test
-#
-#on:
-#  push:
-#    branches: [ main, master ]
-#  pull_request:
-#    branches: [ main, master ]
-#
-#jobs:
-#  test:
-#    runs-on: ubuntu-latest
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v3
-#
-#      - name: Set up Docker Buildx
-#        uses: docker/setup-buildx-action@v2
-#
-#      - name: Create MongoDB initialization directory
-#        run: |
-#          mkdir -p ./backend/.dataBase
-#          touch ./backend/.dataBase/mongo-init.js
-#          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
-#          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
-#
-#      - name: Create .env file
-#        run: |
-#          echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
-#          echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
-#          echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
-#
-##      - name: Fix MongoDB connection string in test file
-##        run: |
-##          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
-##
-##      - name: Increase Jest timeout in test file
-##        run: |
-##          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
-#
-#      - name: Start Docker Compose services
-#        run: docker compose up -d
-#
-#      - name: Wait for MongoDB to be ready
-#        run: |
-#          sleep 20
-#          docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
-#
-#      - name: Run tests
-#        run: docker compose exec -T app npm test
-#
-#      - name: Display logs if tests fail
-#        if: failure()
-#        run: docker compose logs
-#
-#      - name: Clean up
-#        if: always()
-#        run: docker compose down -v
 
 #name: CI/CD Pipeline
 #
