@@ -11,7 +11,7 @@ services:
       - /app/node_modules
     restart: on-failure
     command: >
-      sh -c "node server.js"  # Замінили на server.js
+      sh -c "node server.js & sleep 15 && npm run test"  # Замінили на server.js
 
   db:
     image: mongo
