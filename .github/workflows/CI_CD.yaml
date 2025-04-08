@@ -1,59 +1,65 @@
-name: CI Workflow
+name: Jokes API Test
 
 on:
   push:
-    branches:
-      - master
+    branches: [ main, master ]
   pull_request:
-    branches:
-      - master
+    branches: [ main, master ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     services:
-      db:
-        image: mongo:latest
-        ports:
-          - 27017:27017
+      mongodb:
+        image: mongo
         env:
           MONGO_INITDB_ROOT_USERNAME: user
           MONGO_INITDB_ROOT_PASSWORD: user
+          MONGO_INITDB_DATABASE: my_database
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongosh --eval \"db.adminCommand('ping')\"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
-      - name: Checkout репозиторій
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd backend
-          npm install
+        run: cd backend && npm install
 
-      - name: Set up Docker Compose
+      - name: Copy environment file
         run: |
-          sudo apt-get install docker-compose
+          if [ -f "./backend/.env.example" ]; then
+            cp ./backend/.env.example ./backend/.env
+          else
+            echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
+            echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
+            echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
+            echo "DATABASE_URL=mongodb://user:user@localhost:27017/my_database?authSource=admin" >> ./backend/.env
+          fi
 
-      - name: Build and run Docker containers
+      - name: Initialize MongoDB
         run: |
-          docker-compose -f docker-compose.yml up -d
-          sleep 15  # Затримка, щоб контейнери встигли піднятися
+          if [ -f "./backend/.dataBase/mongo-init.js" ]; then
+            mongosh "mongodb://user:user@localhost:27017/admin" --file ./backend/.dataBase/mongo-init.js
+          fi
 
       - name: Run tests
-        run: |
-          cd backend
-          npm run test
-
-      - name: Shutdown Docker containers
-        run: |
-          docker-compose -f docker-compose.yml down
-
-      - name: Upload test results
-        if: failure()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: ./backend/test-results
+        run: cd backend && npm test
+        env:
+          NODE_ENV: test
+          DATABASE_URL: mongodb://user:user@localhost:27017/my_database?authSource=admin
 
 
 #name: CI/CD Pipeline
