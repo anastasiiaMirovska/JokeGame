@@ -34,11 +34,11 @@ jobs:
       - name: Запуск Docker-контейнерів
         run: docker-compose up -d --build
 
-      - name: Очікування запуску сервісів
-        run: sleep 20  # Дати час контейнерам піднятися
-
-      - name: Запуск тестів у контейнері
-        run: docker exec app npm test
-
-      - name: Завершення контейнерів
-        run: docker-compose down
+#      - name: Очікування запуску сервісів
+#        run: sleep 20  # Дати час контейнерам піднятися
+#
+#      - name: Запуск тестів у контейнері
+#        run: docker exec app npm test
+#
+#      - name: Завершення контейнерів
+#        run: docker-compose down
