@@ -4,341 +4,41 @@ on:
   push:
     branches:
       - master
-
   pull_request:
     branches:
       - master
 
-
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27018:27017
+
     steps:
       - name: Checkout репозиторій
         uses: actions/checkout@v4
 
-      - name: Встановлення Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Встановлення залежностей для фронтенду
+      - name: Встановлення Docker Compose
         run: |
-          cd frontend
-          npm ci
-          npm run build
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
-      - name: Встановлення залежностей для бекенду
+      - name: Створення .env для бекенду
         run: |
-          cd backend
-          npm ci
+          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+          echo "MONGODB_URI=mongodb://user:user@db:27017/my_database?authSource=admin" >> backend/.env
 
-      - name: Запуск Docker контейнерів
+      - name: Запуск Docker-контейнерів
         run: docker-compose up -d --build
 
       - name: Очікування запуску сервісів
-        run: sleep 10
+        run: sleep 20  # Дати час контейнерам піднятися
 
-      - name: Зупинка Docker контейнерів
+      - name: Запуск тестів у контейнері
+        run: docker exec app npm test
+
+      - name: Завершення контейнерів
         run: docker-compose down
-
-#name: CI/CD Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - master
-#  pull_request:
-#    branches:
-#      - master
-#
-#jobs:
-#  build-and-test:
-#    runs-on: ubuntu-latest
-#    services:
-#      mongodb:
-#        image: mongo:latest
-#        ports:
-#          - 27018:27017
-#
-#
-#    steps:
-#      - name: Checkout репозиторій
-#        uses: actions/checkout@v4
-#
-#      - name: Встановлення Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 18
-#
-#      - name: Встановлення залежностей для фронтенду
-#        run: |
-#          cd frontend
-#          npm ci
-#          npm run build
-#
-#      - name: Встановлення залежностей для бекенду
-#        run: |
-#          cd backend
-#          npm ci
-#
-#      - name: Створення .env для бекенду
-#        run: |
-#          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-#          echo "MONGODB_URI=mongodb://user:user@localhost:27018/my_database?authSource=admin" >> backend/.env
-#
-
-      - name: Install mongosh
-        run: |
-          sudo apt-get install gnupg
-          wget -qO- https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-7.0.asc
-          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-          sudo apt-get update
-          sudo apt-get install -y mongodb-mongosh
-          mongosh --version
-
-      - name: Initalize MongoDB
-        run: |
-          mongosh --host localhost:27018 -u user -p user --authenticationDatabase admin <<EOF
-            db = db.getSiblingDB('my_database');
-            db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });
-            db.createCollection('jokes');
-          EOF
-
-      - name: Запуск тестів
-        run: |
-          cd backend
-          npm run test
-
-
-
-
-#name: CI/CD Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - master
-#
-#  pull_request:
-#    branches:
-#      - master
-#
-#
-#jobs:
-#  build-and-test:
-#    runs-on: ubuntu-latest
-#    services:
-#      mongo:
-#        image: mongo:6.0
-#        ports:
-#          - 27017:27017
-#        env:
-#          MONGO_INITDB_DATABASE: my_database
-#          MONGO_INITDB_ROOT_USERNAME: user
-#          MONGO_INITDB_ROOT_PASSWORD: user
-#        options: >-
-#          --health-cmd "mongosh --eval 'db.serverStatus()'"
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#    steps:
-#
-#      - name: Checkout репозиторій
-#        uses: actions/checkout@v4
-#
-#      - name: Встановлення Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 18
-#
-#      - name: Встановлення залежностей для фронтенду
-#        run: |
-#          cd frontend
-#          npm ci
-#          npm run build
-#
-#      - name: Встановлення залежностей для бекенду
-#        run: |
-#          cd backend
-#          npm ci
-#
-#      - name: Створення .env для бекенду
-#        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-#
-#      - name: Install mongosh
-#        run: |
-#          sudo apt-get install gnupg
-#          wget -qO- https://www.mongodb.org/static/pgp/server-7.0.asc | sudo tee /etc/apt/trusted.gpg.d/server-7.0.asc
-#          echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-#          sudo apt-get update
-#          sudo apt-get install -y mongodb-mongosh
-#          mongosh --version
-#
-#      - name: Initalize MongoDB
-#        run: |
-#          mongosh --host localhost:27017 -u admin -p admin --authenticationDatabase admin <<EOF
-#            db = db.getSiblingDB('my_database');
-#            db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'APP-DB' }] })
-#            db.createCollection('jokes');
-#          EOF
-#          # Do whatever you like in here
-#
-#      - name: Test
-#        run: |
-#          echo "npm run test"
-#
-#      - name: Запуск Docker контейнерів
-#        run: docker compose up -d --build
-#
-#      - name: Очікування запуску сервісів
-#        run: sleep 10
-#
-#      - name: Запуск тестів
-#        run: |
-#          cd backend
-#          npm run test
-#
-#      - name: Зупинка Docker контейнерів
-#        run: docker compose down
-#
-
-
-
-
-
-
-
-
-
-#name: CI/CD Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - master
-#
-#  pull_request:
-#    branches:
-#      - master
-#
-#jobs:
-#  build-and-test:
-#    runs-on: ubuntu-latest
-#    services:
-#      mongo:
-#        image: mongo:6.0
-#        ports:
-#          - 27018:27017
-#        env:
-#          MONGO_INITDB_DATABASE: my_database
-#          MONGO_INITDB_ROOT_USERNAME: user
-#          MONGO_INITDB_ROOT_PASSWORD: user
-#        options: >-
-#          --health-cmd "mongosh --eval 'db.serverStatus()'"
-#          --health-interval 10s
-#          --health-timeout 5s
-#          --health-retries 5
-#
-#    steps:
-#      - name: Checkout репозиторій
-#        uses: actions/checkout@v4
-#
-#      - name: Встановлення Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 18
-#
-#      - name: Встановлення залежностей для фронтенду
-#        run: |
-#          cd frontend
-#          npm ci
-#          npm run build
-#
-#      - name: Встановлення залежностей для бекенду
-#        run: |
-#          cd backend
-#          npm ci
-#
-#      - name: Створення .env для бекенду
-#        run: |
-#          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-#          echo "MONGODB_URI=mongodb://root:example@localhost:27017" >> backend/.env
-#
-#      - name: Збірка та запуск додатку
-#        run: |
-#          docker build -t joke-app ./backend
-#          docker run -d --name joke-app \
-#            -p 3000:3000 \
-#            -e MONGODB_URI=mongodb://root:example@host.docker.internal:27017 \
-#            joke-app
-#
-#      - name: Очікування запуску додатку
-#        run: |
-#          echo "Waiting for application to be ready..."
-#          sleep 5
-#          curl -f http://localhost:3000/api/joke/ || exit 1
-#          echo "Application is ready!"
-#
-#      - name: Запуск тестів
-#        run: |
-#          cd backend
-#          npm run test
-#
-#      - name: Очищення Docker контейнерів
-#        run: docker rm -f joke-app
-
-
-#name: CI/CD Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - master
-#
-#  pull_request:
-#    branches:
-#      - master
-#
-#
-#jobs:
-#  build-and-test:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Checkout репозиторій
-#        uses: actions/checkout@v4
-#
-#      - name: Встановлення Node.js
-#        uses: actions/setup-node@v4
-#        with:
-#          node-version: 18
-#
-#      - name: Встановлення залежностей для фронтенду
-#        run: |
-#          cd frontend
-#          npm ci
-#          npm run build
-#
-#      - name: Встановлення залежностей для бекенду
-#        run: |
-#          cd backend
-#          npm ci
-#
-#      - name: Створення .env для бекенду
-#        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-#
-#      - name: Запуск Docker контейнерів
-#        run: docker compose up -d --build
-#
-#      - name: Очікування запуску сервісів
-#        run: sleep 10
-#
-#      - name: Запуск тестів
-#        run: |
-#          cd backend
-#          npm run test
-#
-#      - name: Зупинка Docker контейнерів
-#        run: docker compose down
-#
-
