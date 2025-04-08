@@ -3,20 +3,16 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - master
+      - main
+
   pull_request:
     branches:
-      - master
+      - main
+
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    services:
-      mongodb:
-        image: mongo:latest
-        ports:
-          - 27018:27017
-
     steps:
       - name: Checkout репозиторій
         uses: actions/checkout@v4
@@ -26,19 +22,25 @@ jobs:
         with:
           node-version: 18
 
+      - name: Встановлення залежностей для фронтенду
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+      - name: Встановлення залежностей для бекенду
+        run: |
+          cd backend
+          npm ci
+
       - name: Запуск Docker контейнерів
-        run: |
-          docker-compose up -d
-          sleep 15  # Чекаємо, щоб база і бекенд піднялися
+        run: docker-compose up -d --build
 
-      - name: Виконання тестів у контейнері
-        run: |
-          docker exec app npm test
+      - name: Очікування запуску сервісів
+        run: sleep 10
 
-      - name: Зупинка контейнерів
-        run: |
-          docker-compose down
-
+      - name: Зупинка Docker контейнерів
+        run: docker-compose down
 
 #name: CI/CD Pipeline
 #
