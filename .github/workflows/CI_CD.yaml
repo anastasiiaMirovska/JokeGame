@@ -37,6 +37,13 @@ jobs:
 #      - name: Increase Jest timeout in test file
 #        run: |
 #          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
+      #      - name: Fix MongoDB connection string in test file
+      #        run: |
+      #          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
+      #
+      #      - name: Increase Jest timeout in test file
+      #        run: |
+      #          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
 
       - name: Start Docker Compose services
         run: docker compose up -d

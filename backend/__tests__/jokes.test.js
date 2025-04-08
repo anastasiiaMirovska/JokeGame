@@ -46,7 +46,7 @@ describe('Jokes API', () => {
     })
 
     it("should return 201 if jokes add", async () => {
-        const res = await request(app).get("/api/joke/add");
+        const res = await request(app).get("/api/joke/add/");
         expect(res.statusCode).toBe(201);
         // expect(res.body.error).toBe("Joke not found");
     });
