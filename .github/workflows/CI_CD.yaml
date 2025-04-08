@@ -37,8 +37,8 @@ jobs:
 #      - name: Очікування запуску сервісів
 #        run: sleep 20  # Дати час контейнерам піднятися
 #
-#      - name: Запуск тестів у контейнері
-#        run: docker exec app npm test
-#
-#      - name: Завершення контейнерів
-#        run: docker-compose down
+      - name: Запуск тестів у контейнері
+        run: docker exec jokegame_app_1 npm test
+
+      - name: Завершення контейнерів
+        run: docker-compose down
