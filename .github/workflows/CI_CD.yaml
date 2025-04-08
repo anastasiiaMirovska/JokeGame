@@ -17,7 +17,6 @@ jobs:
         ports:
           - 27018:27017
 
-
     steps:
       - name: Checkout репозиторій
         uses: actions/checkout@v4
@@ -27,22 +26,65 @@ jobs:
         with:
           node-version: 18
 
-      - name: Встановлення залежностей для фронтенду
+      - name: Запуск Docker контейнерів
         run: |
-          cd frontend
-          npm ci
-          npm run build
+          docker-compose up -d
+          sleep 15  # Чекаємо, щоб база і бекенд піднялися
 
-      - name: Встановлення залежностей для бекенду
+      - name: Виконання тестів у контейнері
         run: |
-          cd backend
-          npm ci
+          docker exec app npm test
 
-      - name: Створення .env для бекенду
+      - name: Зупинка контейнерів
         run: |
-          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-          echo "MONGODB_URI=mongodb://user:user@localhost:27018/my_database?authSource=admin" >> backend/.env
+          docker-compose down
 
+
+#name: CI/CD Pipeline
+#
+#on:
+#  push:
+#    branches:
+#      - master
+#  pull_request:
+#    branches:
+#      - master
+#
+#jobs:
+#  build-and-test:
+#    runs-on: ubuntu-latest
+#    services:
+#      mongodb:
+#        image: mongo:latest
+#        ports:
+#          - 27018:27017
+#
+#
+#    steps:
+#      - name: Checkout репозиторій
+#        uses: actions/checkout@v4
+#
+#      - name: Встановлення Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: 18
+#
+#      - name: Встановлення залежностей для фронтенду
+#        run: |
+#          cd frontend
+#          npm ci
+#          npm run build
+#
+#      - name: Встановлення залежностей для бекенду
+#        run: |
+#          cd backend
+#          npm ci
+#
+#      - name: Створення .env для бекенду
+#        run: |
+#          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+#          echo "MONGODB_URI=mongodb://user:user@localhost:27018/my_database?authSource=admin" >> backend/.env
+#
 
       - name: Install mongosh
         run: |
