@@ -3,12 +3,17 @@ const app = require('../app'); // Імпортуємо ваш додаток
 const mongoose = require('mongoose');
 const req = require("express/lib/request");
 
+const MONGO_USERNAME = process.env.MONGO_USERNAME || 'user';
+const MONGO_PASSWORD = process.env.MONGO_PASSWORD || 'user';
+const MONGO_DATABASE = process.env.MONGO_DATABASE || 'my_database';
+
+
 describe('Jokes API', () => {
 
     beforeAll(async () => {
         // Підключаємося до бази даних, що працює в Docker на порту 27018
         jest.setTimeout(30000);
-        await mongoose.connect('mongodb://user:user@db:27017/my_database?authSource=admin', {
+        await mongoose.connect(`mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@db:27017/${MONGO_DATABASE}?authSource=admin`, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
