@@ -20,7 +20,7 @@ jobs:
         ports:
           - 27017:27017
         options: >-
-          --health-cmd mongosh --eval \"db.adminCommand('ping')\"
+          --health-cmd="mongosh --eval 'db.adminCommand(\"ping\")'"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -60,7 +60,6 @@ jobs:
         env:
           NODE_ENV: test
           DATABASE_URL: mongodb://user:user@localhost:27017/my_database?authSource=admin
-
 
 #name: CI/CD Pipeline
 #
