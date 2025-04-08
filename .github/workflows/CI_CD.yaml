@@ -10,56 +10,49 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      mongodb:
-        image: mongo
-        env:
-          MONGO_INITDB_ROOT_USERNAME: user
-          MONGO_INITDB_ROOT_PASSWORD: user
-          MONGO_INITDB_DATABASE: my_database
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd="mongosh --eval 'db.adminCommand(\"ping\")'"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install dependencies
-        run: cd backend && npm install
-
-      - name: Copy environment file
+      - name: Create MongoDB initialization directory
         run: |
-          if [ -f "./backend/.env.example" ]; then
-            cp ./backend/.env.example ./backend/.env
-          else
-            echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
-            echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
-            echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
-            echo "DATABASE_URL=mongodb://user:user@localhost:27017/my_database?authSource=admin" >> ./backend/.env
-          fi
+          mkdir -p ./backend/.dataBase
+          touch ./backend/.dataBase/mongo-init.js
+          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
-      - name: Initialize MongoDB
+      - name: Create .env file
         run: |
-          if [ -f "./backend/.dataBase/mongo-init.js" ]; then
-            mongosh "mongodb://user:user@localhost:27017/admin" --file ./backend/.dataBase/mongo-init.js
-          fi
+          echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
+          echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
+          echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
+
+      - name: Fix MongoDB connection string in test file
+        run: |
+          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
+
+      - name: Increase Jest timeout in test file
+        run: |
+          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
+
+      - name: Start Docker Compose services
+        run: docker-compose up -d
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          docker-compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
+          sleep 20
 
       - name: Run tests
-        run: cd backend && npm test
-        env:
-          NODE_ENV: test
-          DATABASE_URL: mongodb://user:user@localhost:27017/my_database?authSource=admin
+        run: docker-compose exec -T app npm test
+
+      - name: Display logs if tests fail
+        if: failure()
+        run: docker-compose logs
+
+      - name: Clean up
+        if: always()
+        run: docker-compose down -v
 
 #name: CI/CD Pipeline
 #
