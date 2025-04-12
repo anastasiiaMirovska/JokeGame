@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const app = require('./app'); // Імпортуємо app без запуску сервера
+const jokeService = require('./services/jokes.service');
+
 
 const connectDB = async () => {
     try {
@@ -9,6 +11,7 @@ const connectDB = async () => {
     } catch (error) {
         console.error('Database connection failed:', error);
         setTimeout(connectDB, 3000);
+        await jokeService.addJokes(10);
     }
 };
 

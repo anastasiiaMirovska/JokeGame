@@ -2,13 +2,15 @@ const request = require('supertest');
 const app = require('../app'); // Імпортуємо ваш додаток
 const mongoose = require('mongoose');
 const req = require("express/lib/request");
+const dotenv = require("dotenv");
+dotenv.config();
 
 describe('Jokes API', () => {
 
     beforeAll(async () => {
         // Підключаємося до бази даних, що працює в Docker на порту 27018
         jest.setTimeout(30000);
-        await mongoose.connect('mongodb://user:user@db:27017/my_database?authSource=admin', {
+        await mongoose.connect(process.env.MONGODB_URI, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -19,30 +21,31 @@ describe('Jokes API', () => {
         await mongoose.connection.close();
     });
 
-    // it("should return a joke and status 200", async () => {
-    //     const res = await request(app).get("/api/joke/");
-    //     expect(res.statusCode).toBe(200);
-    //     expect(res.body).toMatchObject({
-    //         _id: expect.any(String),
-    //         question: expect.any(String),
-    //         answer: expect.any(String),
-    //         votes: expect.arrayContaining([
-    //             expect.objectContaining({
-    //                 value: expect.any(Number),
-    //                 label: expect.any(String)
-    //             })
-    //         ]),
-    //         createdAt: expect.any(String),
-    //         updatedAt:  expect.any(String),
-    //         __v: expect.any(Number),
-    //
-    //     });
-    // });
+    it("should return a joke and status 200", async () => {
+        const res = await request(app).get("/api/joke/");
+        expect(res.statusCode).toBe(200);
+        expect(res.body).toMatchObject({
+            _id: expect.any(String),
+            question: expect.any(String),
+            answer: expect.any(String),
+            votes: expect.arrayContaining([
+                expect.objectContaining({
+                    value: expect.any(Number),
+                    label: expect.any(String)
+                })
+            ]),
+            createdAt: expect.any(String),
+            updatedAt:  expect.any(String),
+            __v: expect.any(Number),
+
+        });
+    });
 
     it("should return all jokes and status 200", async () => {
         const res = await request(app).get('/api/joke/all/');
         expect(res.statusCode).toBe(200);
         expect(Array.isArray(res.body)).toBe(true);
+        expect(res.body.length).gte(1);
     })
 
     it("should return 201 if jokes add", async () => {

@@ -14,6 +14,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -25,10 +31,7 @@ jobs:
           echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Create .env file
-        run: |
-          echo "MONGO_INITDB_ROOT_USERNAME=user" > ./backend/.env
-          echo "MONGO_INITDB_ROOT_PASSWORD=user" >> ./backend/.env
-          echo "MONGO_INITDB_DATABASE=my_database" >> ./backend/.env
+        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
 
 #      - name: Fix MongoDB connection string in test file
 #        run: |
