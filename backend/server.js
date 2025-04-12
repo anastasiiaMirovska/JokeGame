@@ -8,10 +8,10 @@ const connectDB = async () => {
         console.log("Connecting to db...");
         await mongoose.connect(process.env.MONGO_URI);
         console.log('Database connected successfully!');
+        await jokeService.addJokes(10);
     } catch (error) {
         console.error('Database connection failed:', error);
         setTimeout(connectDB, 3000);
-        await jokeService.addJokes(10);
     }
 };
 
