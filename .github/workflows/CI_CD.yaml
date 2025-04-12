@@ -67,7 +67,7 @@ jobs:
 
       - name: Build and push DB image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-db ./backend/.database
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-db ./backend/.dataBase
           docker push ${{ secrets.DOCKER_USERNAME }}/my-db
 
 
