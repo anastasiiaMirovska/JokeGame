@@ -46,7 +46,7 @@ describe('Jokes API', () => {
         expect(res.statusCode).toBe(200);
         expect(Array.isArray(res.body)).toBe(true);
         expect(res.body.length).toBeGreaterThan(0);
-        req.body.forEach((joke) => {
+        res.body.forEach((joke) => {
             expect(joke).toMatchObject({ _id: expect.any(String),
                 question: expect.any(String),
                 answer: expect.any(String),
