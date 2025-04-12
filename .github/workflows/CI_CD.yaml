@@ -28,7 +28,7 @@ jobs:
           mkdir -p ./backend/.dataBase
           touch ./backend/.dataBase/mongo-init.js
           echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: ${{ secrets.DB_USER }}, pwd: ${{ secrets.DB_USER_PASSWORD }}, roles: [{ role: 'readWrite', db: ${{secrets.DB_NAME}} }] });" >> ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Create .env file
         run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
