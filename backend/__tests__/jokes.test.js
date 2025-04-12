@@ -45,7 +45,21 @@ describe('Jokes API', () => {
         const res = await request(app).get('/api/joke/all/');
         expect(res.statusCode).toBe(200);
         expect(Array.isArray(res.body)).toBe(true);
-        expect(res.body.length).gte(1);
+        expect(res.body.length).toBeGreaterThan(0);
+        req.body.forEach((joke) => {
+            expect(joke).toMatchObject({ _id: expect.any(String),
+                question: expect.any(String),
+                answer: expect.any(String),
+                votes: expect.arrayContaining([
+                    expect.objectContaining({
+                        value: expect.any(Number),
+                        label: expect.any(String)
+                    })
+                ]),
+                createdAt: expect.any(String),
+                updatedAt:  expect.any(String),
+                __v: expect.any(Number),})
+        })
     })
 
     it("should return 201 if jokes add", async () => {
