@@ -20,41 +20,17 @@ jobs:
           npm install
           npm run build
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Create MongoDB initialization directory
-        run: |
-          mkdir -p ./backend/.dataBase
-          touch ./backend/.dataBase/mongo-init.js
-          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
-
-      - name: Create .env file
+      - name: Create .env file for backend
         run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-
-#      - name: Fix MongoDB connection string in test file
-#        run: |
-#          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
-#
-#      - name: Increase Jest timeout in test file
-#        run: |
-#          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
-      #      - name: Fix MongoDB connection string in test file
-      #        run: |
-      #          sed -i 's/\*\*\*db:27017/mongodb:\/\/user:user@db:27017/' ./backend/__tests__/jokes.test.js
-      #
-      #      - name: Increase Jest timeout in test file
-      #        run: |
-      #          sed -i '8s/beforeAll(async () => {/beforeAll(async () => { jest.setTimeout(30000);/' ./backend/__tests__/jokes.test.js
 
       - name: Start Docker Compose services
         run: docker compose up -d
 
       - name: Wait for MongoDB to be ready
         run: |
+          echo "Waiting for MongoDB..."
           sleep 20
-          docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
+          docker compose exec -T db mongosh --eval "db.adminCommand('ping')"
 
       - name: Run tests
         run: docker compose exec -T app npm test
@@ -67,47 +43,3 @@ jobs:
         if: always()
         run: docker compose down -v
 
-#name: CI/CD Pipeline
-#
-#on:
-#  push:
-#    branches:
-#      - master
-#  pull_request:
-#    branches:
-#      - master
-#
-#jobs:
-#  build-and-test:
-#    runs-on: ubuntu-latest
-##    services:
-##      mongodb:
-##        image: mongo:latest
-##        ports:
-##          - 27018:27017
-#
-#    steps:
-#      - name: Checkout репозиторій
-#        uses: actions/checkout@v4
-#
-#      - name: Встановлення Docker Compose
-#        run: |
-#          sudo apt-get update
-#          sudo apt-get install -y docker-compose
-#
-#      - name: Створення .env для бекенду
-#        run: |
-#          echo "${{ secrets.BACKEND_ENV }}" > backend/.env
-#          echo "MONGODB_URI=mongodb://user:user@db:27017/my_database?authSource=admin" >> backend/.env
-#
-#      - name: Запуск Docker-контейнерів
-#        run: docker-compose up -d --build
-#
-##      - name: Очікування запуску сервісів
-##        run: sleep 20  # Дати час контейнерам піднятися
-##
-#      - name: Запуск тестів у контейнері
-#        run: docker exec jokegame_app_1 npm test
-#
-#      - name: Завершення контейнерів
-#        run: docker-compose down
