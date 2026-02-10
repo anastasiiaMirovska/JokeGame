@@ -11,6 +11,7 @@ const axiosInstance = axios.create(
 const jokeService = {
     async getAllJokes(): Promise<IJokeModel[]> {
         const {data} = await axiosInstance.get<IJokeModel[]>(urls.allJokes)
+        console.log(data)
         return data
     },
     async getJoke(): Promise<IJokeModel> {

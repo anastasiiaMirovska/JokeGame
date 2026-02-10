@@ -1,5 +1,10 @@
 .idea
-.env
 .venv
 mongo_db
 client
+node_modules
+
+
+.env
+.env.docker
+.env.local

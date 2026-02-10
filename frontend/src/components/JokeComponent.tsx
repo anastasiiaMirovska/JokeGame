@@ -16,6 +16,8 @@ const JokeComponent: FC<IProps> = ({joke, onJokeUpdate, onDelete, onNextJoke}) =
     const [revealAnswer, setRevealAnswer] = useState(false);
     const [revealForm, setRevealForm] = useState(false);
 
+    console.log("joke", joke);
+
     useEffect(() => {
         setRevealAnswer(false);
         setRevealForm(false);

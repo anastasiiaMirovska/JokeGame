@@ -1,3 +1,1 @@
-module.exports = {
-    Jokes: require('./jokeModel')
-}
+export * from "./jokeModel.js"

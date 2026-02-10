@@ -1,0 +1,9 @@
+{
+  "name": "joke-game",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "devDependencies": {
+    "cross-env": "^10.1.0"
+  }
+}

@@ -1,4 +1,4 @@
-const {Schema, model} = require('mongoose');
+import {Schema, model} from "mongoose";
 
 const jokeSchema = new Schema({
     question: {
@@ -29,5 +29,7 @@ const jokeSchema = new Schema({
     // }
 }, {timestamps: true})
 
-module.exports = model('jokes', jokeSchema)
 
+const JokeModel = model('jokes', jokeSchema)
+
+export default JokeModel;
