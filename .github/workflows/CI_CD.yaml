@@ -1,0 +1,63 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Create MongoDB initialization directory
+        run: |
+          mkdir -p ./backend/.dataBase
+          touch ./backend/.dataBase/mongo-init.js
+          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
+
+      - name: Create .env file
+        run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
+
+      - name: Start Docker Compose services
+        run: docker compose up -d
+
+      - name: Wait for MongoDB to be ready
+        run: |
+          sleep 20
+          docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
+
+      - name: Run tests
+        run: docker compose exec -T app npm test
+
+      - name: Display logs if tests fail
+        if: failure()
+        run: docker compose logs
+
+      # --- Docker Hub ---
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
+
+

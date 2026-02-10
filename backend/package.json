@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "cross-env NODE_ENV=local node app.js"
+    "start": "cross-env NODE_ENV=local node app.js",
+    "test": "jest --config=jest.config.js"
   },
   "dependencies": {
     "axios": "^1.7.9",
@@ -18,5 +19,11 @@
     "mongoose": "^8.10.1",
     "morgan": "~1.9.1",
     "pug": "2.0.0-beta11"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "supertest": "^7.1.0",
+    "ts-jest": "^29.2.6"
   }
 }
