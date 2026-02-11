@@ -1,46 +1,61 @@
 # About
 This project is a small web app where you can:
-- read jokes
-- react on them with emojis
-- edit them
-- load new jokes from db
+- Read jokes
+- React to them with emojis
+- Edit jokes
+- Load new jokes from the database
 
-## To run it on Docker:
-- Step 1: download Docker Desktop and npm
+## Running with Docker
+1. **Install prerequisites:** Download and install Docker Desktop and npm.
 
-- Step 2: Open the project folder in your terminal and run:
+2. **Install dependencies:** Open the project folder in your terminal and run:
 
-    ```npm install```
+    ```bash
+    npm install
+    ```
 
-- Step 3:  build the frontend by:
+3. **Build the frontend:**
 
-    ```cd frontend```
+    ```bash
+    cd frontend
+    npm run build
+    ```
 
-    ```npm run build```
+4. **Start the application:**
 
-- Step 4: run
+    ```bash
+    docker compose up --build
+    ```
 
-    ```docker compose up --build```
-
-## To run it locally:
+## Running Locally
 ### 1. Backend
-- Step 1.1: go to the appropriate folder by entering:
+1. Go to the backend folder:
 
-  ```cd backend```
+    ```bash
+    cd backend
+    ```
 
-- Step 2.2: Start:
+2. Start the backend:
 
-  ```npm run start```
+    ```bash
+    npm run start
+    ```
 
 ### 2. Frontend
-- Step 2.1: go to the appropriate folder by entering:
+1. Go to the frontend folder:
 
-    ```cd frontend```
+    ```bash
+    cd frontend
+    ```
 
-- Step 2.2: build:
-  
-  ```npm run build```
+2. Build the frontend:
 
-- Step 2.3: Start:
-  
-  ```npm run start```
+    ```bash
+    npm run build
+    ```
+
+3. Start the frontend:
+
+    ```bash
+    npm run start
+    ```

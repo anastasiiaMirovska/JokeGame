@@ -1,8 +1,14 @@
-const request = require('supertest');
-const app = require('../app'); // Імпортуємо ваш додаток
-const mongoose = require('mongoose');
-const req = require("express/lib/request");
-const dotenv = require("dotenv");
+import request from 'supertest';
+import app from '../app.js'; // Імпортуємо ваш додаток
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+
+
+// const request = require('supertest');
+// const app = require('../app'); // Імпортуємо ваш додаток
+// const mongoose = require('mongoose');
+// const req = require("express/lib/request");
+// const dotenv = require("dotenv");
 dotenv.config();
 
 describe('Jokes API', () => {
