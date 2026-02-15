@@ -40,8 +40,8 @@ jobs:
         run: |
           mkdir -p ./backend/.dataBase
           touch ./backend/.dataBase/mongo-init.js
-          echo "db = db.getSiblingDB('${{ env.DB_NAME}}');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: '${{ env.DB_USER }}', pwd: '${{env.DB_PWD}}', roles: [{ role: 'readWrite', db: '${{ env.DB_NAME}}' }] });" >> ./backend/.dataBase/mongo-init.js
+          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Start Docker Compose services
         run: docker compose up -d
