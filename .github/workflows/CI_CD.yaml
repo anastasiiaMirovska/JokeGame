@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main, master ]
 
+env:
+  IMAGE_NAME: my-backend
+  DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -24,11 +28,20 @@ jobs:
         uses: docker/setup-buildx-action@v2
 
       - name: Create MongoDB initialization directory
+        env:
+          MONGO_INIT_USER: ${{ secrets.MONGO_INIT_USER }}
+          MONGO_INIT_PWD: ${{ secrets.MONGO_INIT_PWD }}
+          MONGO_INIT_DB: ${{ secrets.MONGO_INIT_DB }}
         run: |
           mkdir -p ./backend/.dataBase
-          touch ./backend/.dataBase/mongo-init.js
-          echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: 'user', pwd: 'user', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
+          cat <<EOF > ./backend/.dataBase/mongo-init.js
+          db = db.getSiblingDB('$MONGO_INIT_DB');
+          db.createUser({ 
+            user: '$MONGO_INIT_USER', 
+            pwd: '$MONGO_INIT_PWD', 
+            roles: [{ role: 'readWrite', db: '$MONGO_INIT_DB' }] 
+          });
+          EOF
 
       - name: Create .env file
         run: echo "${{ secrets.BACKEND_ENV }}" > backend/.env
@@ -60,7 +73,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/my-backend:latest ./backend
-          docker push ${{ secrets.DOCKER_USERNAME }}/my-backend:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest ./backend
+          docker push ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
 
