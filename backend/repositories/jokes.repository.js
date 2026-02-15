@@ -1,12 +1,12 @@
-const { Jokes } = require("../dataBase");
+import {JokeModel} from "../dataBase/jokeModel.js"
 
 class JokesRepository {
     async getRandomJoke() {
-        return await Jokes.aggregate([{ $sample: { size: 1 } }]);
+        return await JokeModel.aggregate([{ $sample: { size: 1 } }]);
     }
 
     async findById(id) {
-        return await Jokes.findById(id);
+        return await JokeModel.findById(id);
     }
 
     async save(joke) {
@@ -14,16 +14,16 @@ class JokesRepository {
     }
 
     async deleteById(id) {
-        return await Jokes.findByIdAndDelete(id);
+        return await JokeModel.findByIdAndDelete(id);
     }
 
     async getAllJokes() {
-        return await Jokes.find();
+        return await JokeModel.find();
     }
 
     async findByQuestionAndAnswer(question, answer) {
-        return await Jokes.findOne({ question, answer });
+        return await JokeModel.findOne({ question, answer });
     }
 }
 
-module.exports = new JokesRepository();
+export const jokesRepository = new JokesRepository();

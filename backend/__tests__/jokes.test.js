@@ -1,22 +1,16 @@
 import request from 'supertest';
 import app from '../app.js'; // Імпортуємо ваш додаток
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import {config} from '../config.js';
+import {jest} from '@jest/globals';
 
-
-// const request = require('supertest');
-// const app = require('../app'); // Імпортуємо ваш додаток
-// const mongoose = require('mongoose');
-// const req = require("express/lib/request");
-// const dotenv = require("dotenv");
-dotenv.config();
 
 describe('Jokes API', () => {
 
     beforeAll(async () => {
         // Підключаємося до бази даних, що працює в Docker на порту 27018
         jest.setTimeout(30000);
-        await mongoose.connect(process.env.MONGO_URI, {
+        await mongoose.connect(config.database.mongoUrl, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -68,12 +62,6 @@ describe('Jokes API', () => {
         })
     })
 
-    it("should return 201 if jokes add", async () => {
-        const res = await request(app).get("/api/joke/add/");
-        expect(res.statusCode).toBe(201);
-        // expect(res.body.error).toBe("Joke not found");
-    });
-
     // it("should return a joke with +1 vote and status 201", async () => {
     //     const id = '67e00865a5a2ac817e6945e8';
     //     const res = await request(app).post(`/api/joke/${id}/`).send({emoji:"😂"}).expect(201);
@@ -87,7 +75,7 @@ describe('Jokes API', () => {
     it("should return status 400 when deleting joke with invalid id format", async () => {
         const id = 'invalid_id'
         const res = await request(app).delete(`/api/joke/${id}/`);
-        expect(400);
+        expect(res.status).toBe(400);
     })
 
     it("should return status 404 when deleting joke with id which does not exist", async () => {

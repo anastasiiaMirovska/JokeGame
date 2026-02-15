@@ -30,6 +30,4 @@ const jokeSchema = new Schema({
 }, {timestamps: true})
 
 
-const JokeModel = model('jokes', jokeSchema)
-
-export default JokeModel;
+export const JokeModel = model('jokes', jokeSchema)

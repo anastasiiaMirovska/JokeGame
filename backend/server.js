@@ -1,28 +1,37 @@
-const mongoose = require('mongoose');
-const app = require('./app'); // Імпортуємо app без запуску сервера
-const jokeService = require('./services/jokes.service');
+import mongoose from 'mongoose';
+import app from './app.js';
+import { config } from './config.js';
+import { jokesService } from './services/jokes.service.js';
 
-
-const connectDB = async () => {
+const connectDB = async (retries = 10) => {
     try {
         console.log("Connecting to db...");
-        await mongoose.connect(process.env.MONGO_URI);
+        // Використовуй або config.database.mongoUrl, або process.env.MONGO_URI (вибери щось одне)
+        await mongoose.connect(config.database.mongoUrl || process.env.MONGO_URI);
         console.log('Database connected successfully!');
-        await jokeService.addJokes(10);
     } catch (error) {
         console.error('Database connection failed:', error);
-        setTimeout(connectDB, 3000);
+        if (retries === 0) throw new Error('Could not connect to database');
+        console.log("Retrying in 3 seconds...");
+        await new Promise(res => setTimeout(res, 3000));
+        return connectDB(retries - 1);
     }
 };
 
-const startServer = async () => {
-    await connectDB();
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+const start = async () => {
+    try {
+        await connectDB();
+        const port = config.app.port || process.env.PORT || 3000;
+
+        app.listen(port, () => {
+            console.log(`🚀 Server listening on port ${port}`);
+            // Запускаємо фонову задачу тільки тут!
+            jokesService.addJokes(5);
+        });
+    } catch (e) {
+        console.error('Fatal: Server failed to start:', e);
+        process.exit(1);
+    }
 };
 
-if (require.main === module) {
-    startServer(); // Запускаємо сервер тільки якщо цей файл викликається напряму
-}
-
-module.exports = { app, connectDB };
+start();

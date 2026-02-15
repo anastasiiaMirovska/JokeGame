@@ -1,11 +1,10 @@
-const jokeService = require("../services/jokes.service");
-const mongoose = require('mongoose');
-
+import {jokesService} from "../services/jokes.service.js";
+import mongoose from "mongoose"
 
 class JokesController {
     async getJoke(req, res) {
         try {
-            const joke = await jokeService.getRandomJoke();
+            const joke = await jokesService.getRandomJoke();
             res.status(200).json(joke);
         } catch (error) {
             res.status(500).json({ error: "Internal Server Error" });
@@ -16,7 +15,7 @@ class JokesController {
         try {
             const { id } = req.params;
             const { emoji } = req.body;
-            const updatedJoke = await jokeService.voteForJoke(id, emoji);
+            const updatedJoke = await jokesService.voteForJoke(id, emoji);
             res.status(201).json(updatedJoke);
         } catch (error) {
             if (error.message === "Emoji is required") {
@@ -35,7 +34,7 @@ class JokesController {
             const { id } = req.params;
             const { question, answer } = req.body; // Оновлення через body
 
-            const changedJoke = await jokeService.changeJoke(id, question, answer);
+            const changedJoke = await jokesService.changeJoke(id, question, answer);
             res.status(200).json(changedJoke);
         } catch (error) {
             if (error.message === "Joke not found") {
@@ -55,7 +54,7 @@ class JokesController {
                 return res.status(400).json({ error: "Invalid ID format" });
             }
 
-            await jokeService.deleteJoke(id); // Видаляємо жарт
+            await jokesService.deleteJoke(id); // Видаляємо жарт
             res.status(204).send(); // 204 No Content
         } catch (error) {
             if (error.message === "Joke not found") {
@@ -68,7 +67,7 @@ class JokesController {
 
     async getAllJokes(req, res) {
         try{
-            const jokes = await jokeService.getAllJokes();
+            const jokes = await jokesService.getAllJokes();
             res.status(200).json(jokes);
         }
         catch(error) {
@@ -80,7 +79,7 @@ class JokesController {
     async addJokes(req, res) {
         try {
             // Викликаємо сервіс для додавання жартів
-            await jokeService.addJokes(10); // Додаємо 10 жартів
+            await jokesService.addJokes(10); // Додаємо 10 жартів
             res.status(201).json({ message: "Jokes added successfully" });
         } catch (error) {
             console.error("Error fetching jokes:", error);
@@ -89,4 +88,4 @@ class JokesController {
     }
 }
 
-module.exports = new JokesController();
+export const jokesController = new JokesController();

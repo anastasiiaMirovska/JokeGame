@@ -1,10 +1,10 @@
-const jokeRepository = require("../repositories/jokes.repository");
-const {Jokes} = require("../dataBase");
-const {get} = require("axios");
+import {jokesRepository} from "../repositories/jokes.repository.js";
+import {JokeModel} from "../dataBase/jokeModel.js";
+import axios from "axios";
 
-class JokeService {
+class JokesService {
     async getRandomJoke() {
-        const joke = await jokeRepository.getRandomJoke();
+        const joke = await jokesRepository.getRandomJoke();
         return joke[0];
     }
 
@@ -13,7 +13,7 @@ class JokeService {
             throw new Error("Emoji is required");
         }
 
-        const joke = await jokeRepository.findById(id);
+        const joke = await jokesRepository.findById(id);
         if (!joke) {
             throw new Error("Joke not found");
         }
@@ -25,21 +25,21 @@ class JokeService {
             joke.votes.push({ label: emoji, value: 1 });
         }
 
-        return await jokeRepository.save(joke);
+        return await jokesRepository.save(joke);
     }
 
     async changeJoke(id, question, answer) {
-        const joke = await jokeRepository.findById(id);
+        const joke = await jokesRepository.findById(id);
         if (!joke) {
             throw new Error("Joke not found");
         }
         joke.question = question;
         joke.answer = answer;
-        return await jokeRepository.save(joke);
+        return await jokesRepository.save(joke);
     }
 
     async deleteJoke(id) {
-        const joke = await jokeRepository.deleteById(id);
+        const joke = await jokesRepository.deleteById(id);
         if (!joke) {
             throw new Error("Joke not found");
         }
@@ -47,7 +47,7 @@ class JokeService {
     }
 
     async getAllJokes() {
-        const jokes = await jokeRepository.getAllJokes()
+        const jokes = await jokesRepository.getAllJokes()
         if (!jokes || jokes.length === 0) {
             return [];  // Або повернути 200, навіть якщо жартів нема
         }
@@ -62,12 +62,12 @@ class JokeService {
 
     async fetchAndSaveJoke() {
         try {
-            const response = await get('https://teehee.dev/api/joke');
+            const response = await axios.get('https://teehee.dev/api/joke');
             const jokeData = response.data;
 
-            const existingJoke = await jokeRepository.findByQuestionAndAnswer(jokeData.question, jokeData.answer);
+            const existingJoke = await jokesRepository.findByQuestionAndAnswer(jokeData.question, jokeData.answer);
             if (!existingJoke) {
-                const joke = new Jokes({
+                const joke = new JokeModel({
                     question: jokeData.question,
                     answer: jokeData.answer,
                     votes: [
@@ -76,7 +76,7 @@ class JokeService {
                         { value: 0, label: "❤️" },
                     ],
                 });
-                await jokeRepository.save(joke); // Зберігаємо жарт
+                await jokesRepository.save(joke); // Зберігаємо жарт
                 console.log(`Joke was saved: ${joke.question}`);
             } else {
                 console.log(`Joke already exists: ${jokeData.question}`);
@@ -87,4 +87,4 @@ class JokeService {
     }
 }
 
-module.exports = new JokeService();
+export const jokesService = new JokesService();

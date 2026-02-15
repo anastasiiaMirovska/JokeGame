@@ -14,7 +14,7 @@ services:
     depends_on:
       - db
     command: >
-      sh -c "node app.js"
+      sh -c "node server.js"
 
 
   db:
