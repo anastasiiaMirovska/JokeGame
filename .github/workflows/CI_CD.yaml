@@ -39,14 +39,9 @@ jobs:
       - name: Create MongoDB initialization directory
         run: |
           mkdir -p ./backend/.dataBase
-          cat <<EOF > ./backend/.dataBase/mongo-init.js
-          db = db.getSiblingDB('${{ env.DB_NAME }}');
-          db.createUser({ 
-            user: '${{ env.DB_USER }}', 
-            pwd: '${{ env.DB_PWD }}', 
-            roles: [{ role: 'readWrite', db: '${{ env.DB_NAME }}' }] 
-          });
-          EOF
+          touch ./backend/.dataBase/mongo-init.js
+          echo "db = db.getSiblingDB('${{ env.DB_NAME}}');" > ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: '${{ env.DB_USER }}', pwd: '${{env.DB_PWD}}', roles: [{ role: 'readWrite', db: '${{ env.DB_NAME}}' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Start Docker Compose services
         run: docker compose up -d
