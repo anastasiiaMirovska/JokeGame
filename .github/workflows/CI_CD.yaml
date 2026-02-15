@@ -45,7 +45,7 @@ jobs:
           docker compose exec -T db mongosh --eval "db.adminCommand('ping')" || true
 
       - name: Run tests
-        run: docker compose exec -T app npm test:docker
+        run: docker compose exec -T app npm run test:docker
 
       - name: Display logs if tests fail
         if: failure()
