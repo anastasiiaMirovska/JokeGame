@@ -41,7 +41,7 @@ jobs:
           mkdir -p ./backend/.dataBase
           touch ./backend/.dataBase/mongo-init.js
           echo "db = db.getSiblingDB('my_database');" > ./backend/.dataBase/mongo-init.js
-          echo "db.createUser({ user: '${{env.DB_USER}}', pwd: '${{ env.DB_PWD }}', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
+          echo "db.createUser({ user: '${{secrets.DB_USER}}', pwd: '${{ secrets.DB_PWD }}', roles: [{ role: 'readWrite', db: 'my_database' }] });" >> ./backend/.dataBase/mongo-init.js
 
       - name: Start Docker Compose services
         run: docker compose up -d
@@ -49,7 +49,7 @@ jobs:
       - name: Wait for MongoDB to be ready
         run: |
           sleep 20
-          docker compose exec -T db mongosh -u ${{ secrets.DB_USER }} -p ${{ secrets.DB_PASSWORD }} --authenticationDatabase admin --eval "db.adminCommand('ping')" || true
+          docker compose exec -T db mongosh -u ${{ env.DB_USER }} -p ${{ env.DB_PWD }} --authenticationDatabase admin --eval "db.adminCommand('ping')" || true
 
       - name: Run tests
         run: docker compose exec -T app npm run test:docker
