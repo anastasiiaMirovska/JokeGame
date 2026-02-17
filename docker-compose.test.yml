@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mongo
+    env_file:
+      - ./backend/.env.test
+    volumes:
+      - ./backend/.dataBase/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+
+  app:
+    build: ./backend
+    env_file:
+      - ./backend/.env.test
+    depends_on:
+      - db
+    command: npm run test:docker

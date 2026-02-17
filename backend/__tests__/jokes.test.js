@@ -6,6 +6,7 @@ import {jest} from '@jest/globals';
 
 
 describe('Jokes API', () => {
+    let jokeId;
 
     beforeAll(async () => {
         // Підключаємося до бази даних, що працює в Docker на порту 27018
@@ -14,6 +15,7 @@ describe('Jokes API', () => {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
+        await request(app).get("/api/joke/add/");
     });
 
     afterAll(async () => {
@@ -83,10 +85,10 @@ describe('Jokes API', () => {
         const res = await request(app).delete(`/api/joke/${id}/`);
         expect(res.status).toBe(404);
     })
-    //
-    // it("should return status 204 when deleting joke with existing id", async () => {
-    //     const id = '67e007b84ec7c503e208d069'
-    //     const res = await request(app).delete(`/api/joke/${id}/`);
-    //     expect(res.status).toBe(204);
-    // })
+
+    it("should return status 204 when deleting joke with existing id", async () => {
+        const joke = await request(app).get("/api/joke/");
+        expect(joke.statusCode).toBe(200);
+        const res = await request(app).delete(`/api/joke/${joke.body._id}/`);
+    })
 });
