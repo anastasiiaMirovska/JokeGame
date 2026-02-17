@@ -7,7 +7,6 @@
     "start": "cross-env NODE_ENV=local node server.js",
     "test:local": "npx cross-env NODE_ENV=local NODE_OPTIONS=--experimental-vm-modules node node_modules/jest/bin/jest.js --forceExit",
     "test:docker": "npx cross-env NODE_ENV=docker NODE_OPTIONS=--experimental-vm-modules node node_modules/jest/bin/jest.js --forceExit"
-
   },
   "dependencies": {
     "axios": "^1.7.9",
