@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -38,11 +37,15 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up frontend
         run: |
           cd frontend
           npm install
           npm run build
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -58,7 +61,7 @@ jobs:
       - name: Build frontend image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
 
-      - name: (Optional) Push images to Docker Hub
+      - name: Push images to Docker Hub
         run: |
           docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
