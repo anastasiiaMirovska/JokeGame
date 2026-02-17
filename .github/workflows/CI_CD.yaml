@@ -14,12 +14,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up frontend
-        run: |
-          cd frontend
-          npm install
-          npm run build
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -29,12 +23,42 @@ jobs:
       - name: Create .env.docker file
         run: echo "${{ secrets.BACKEND_DOCKER_ENV }}" > backend/.env.docker
 
-      - name: Start Docker Compose services
-        run: docker compose up -d --build
-
-      - name: Run tests
-        run: docker compose exec -T app npm run test:docker
+      - name: Start Docker Compose for tests
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit
 
       - name: Display logs if tests fail
         if: failure()
-        run: docker compose logs
+        run: docker compose -f docker-compose.test.yml logs
+
+      - name: Tear down Docker
+        if: always()
+        run: docker compose -f docker-compose.test.yml down
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build backend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/backend:latest ./backend
+
+      - name: Build frontend image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
+
+      - name: (Optional) Push images to Docker Hub
+        run: |
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
