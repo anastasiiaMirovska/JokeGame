@@ -1,9 +1,11 @@
-db = db.getSiblingDB(process.env.TEST_MONGO_INITDB_DATABASE);
+import {config} from "../config"
+
+db = db.getSiblingDB(config.database.mongoDatabaseName);
 
 db.createUser({
-  user: process.env.TEST_MONGO_INITDB_ROOT_USERNAME,
-  pwd: process.env.TEST_MONGO_INITDB_ROOT_PASSWORD,
+  user: config.database.mongoRootUsername,
+  pwd: config.database.mongoRootPassword,
   roles: [
-    { role: 'readWrite', db: process.env.TEST_MONGO_INITDB_DATABASE }
+    { role: 'readWrite', db: config.database.mongoDatabaseName }
   ]
 });

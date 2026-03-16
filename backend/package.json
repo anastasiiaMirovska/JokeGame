@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "echo \"No build step required for pure JS backend\"",
     "start": "cross-env NODE_ENV=local node server.js",
     "test:docker": "npx cross-env NODE_ENV=docker NODE_OPTIONS=--experimental-vm-modules node node_modules/jest/bin/jest.js --forceExit"
   },
