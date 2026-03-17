@@ -1,0 +1,61 @@
+pipeline {
+    agent none 
+
+    tools {
+        nodejs 'NodeJSv22'
+    }
+
+    stages {
+        stage('Testing local connection') {
+            agent any 
+            steps {
+                sh "echo Hello from \$(hostname -I)!"
+            }
+        }
+
+        stage('Testing remote connection') {
+            agent { label 'my-agent' }
+            steps {
+                sh "echo Hello from \$(hostname -I)!"
+            }
+        }
+
+        stage('Getting project') {
+            agent { label 'my-agent' }
+            steps {
+                sh "rm -rf JokeGame"
+                sh "git clone https://github.com/anastasiiaMirovska/JokeGame"
+            }
+        }
+
+        stage("SonarQube analysis") {
+            agent { label 'my-agent' }
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQube Scanner';
+                    withSonarQubeEnv('sonarqube-server') {
+                        sh "cd JokeGame; ${scannerHome}/bin/sonar-scanner" 
+                    }
+                }
+            }
+        }
+
+        stage('Installing dependencies') {
+            agent { label 'my-agent' }
+            steps {
+                dir('JokeGame') {
+                   sh "npm install"
+                }
+            }
+        }
+
+        stage('Building artifact') {
+            agent { label 'my-agent' }
+            steps {
+                dir('JokeGame') {
+                    sh "npm run build --if-present"
+                }
+            }
+        }
+    }
+}
