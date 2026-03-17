@@ -5,6 +5,8 @@ This project is a small web app where you can:
 - Edit jokes
 - Load new jokes from the database
 
+This project has an integration with Jenkins and SonarQube checks.
+
 ## Running with Docker
 1. **Install prerequisites:** Download and install Docker Desktop and npm.
 
